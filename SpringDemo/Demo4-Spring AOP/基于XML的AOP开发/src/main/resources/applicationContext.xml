@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--配置目标类-->
+    <bean id="target" class="com.demo.aop.Target"></bean>
+    <!--配置切面类-->
+    <bean id="myAspect" class="com.demo.aop.MyAspect"></bean>
+
+    <!--配置切点表达式和前置增强的织入关系-->
+    <aop:config>
+        <!--引用myAspect的Bean为切面对象-->
+        <aop:aspect ref="myAspect">
+            <!--配置Target的method方法执行时要进行myAspect的before方法前置增强-->
+            <aop:before method="before" pointcut="execution(public void com.demo.aop.Target.method())"></aop:before>
+        </aop:aspect>
+    </aop:config>
+</beans>

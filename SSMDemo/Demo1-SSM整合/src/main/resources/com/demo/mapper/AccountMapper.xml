@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace就是Mapper接口类所在的包路径-->
+<mapper namespace="com.demo.mapper.AccountMapper">
+
+    <!-- 查询所有账户 -->
+    <!--未定义别名前，resultType="com.demo.domain.Account"，定义别名后，resultType="account"-->
+    <!--别名不区分大小写-->
+    <select id="findAll" resultType="account">
+        select * from account
+    </select>
+    <!-- 新增账户 -->
+    <insert id="save" parameterType="account">
+        insert into account(name,money) values(#{name},#{money});
+    </insert>
+</mapper>

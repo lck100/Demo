@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+	<!-- 使用vue实现TAB选项卡切换 -->
+	<head>
+		<meta charset="utf-8">
+		<title>使用vue实现TAB选项卡切换</title>
+		<!-- 使用CDN引入Vue.js -->
+		<script type="text/javascript" src=" https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.8/vue.min.js"></script>
+		<style type="text/css">
+			.tab ul {
+				overflow: hidden;
+				padding: 0;
+				margin: 0;
+			}
+
+			.tab ul li {
+				box-sizing: border-box;
+				padding: 0;
+				float: left;
+				width: 6.25rem;
+				height: 50px;
+				line-height: 50px;
+				list-style: none;
+				text-align: center;
+				border-top: 1px solid blue;
+				border-right: 1px solid blue;
+				cursor: pointer;
+			}
+
+			.tab ul li:first-child {
+				border-color: orange;
+			}
+
+			.tab ul li.active {
+				background-color: orange;
+			}
+
+			.tab div {
+				width: 500px;
+				height: 300px;
+				display: none;
+				text-align: center;
+				font-size: 30px;
+				line-height: 300px;
+				border: 1px solid blue;
+				border-top: 0px;
+			}
+
+			.tab div.current {
+				display: block;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="tab">
+				<ul>
+					<li v-on:click='change(index)' :class="currentIndex==index?'active':''" :key='item.id' v-for="(item,index) in list">{{item.title}}</li>
+				</ul>
+				<div :class="currentIndex==index?'current':''" :key='item.id' v-for="(item,index) in list">
+					<img :src="item.path" :alt="item.title">
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			var vm = new Vue({
+				el: '#app',
+				data: {
+					currentIndex: 0, // 选项卡当前的索引
+					list: [{
+						id: 1,
+						title: "素还真",
+						path: "https://beta.pili.com.tw/img/role/640x741/su_1.jpg"
+					}, {
+						id: 2,
+						title: "青阳子",
+						path: "https://beta.pili.com.tw/img/role/640x741/chingyang_1.jpg"
+					}, {
+						id: 3,
+						title: "玉辞雪",
+						path: "https://beta.pili.com.tw/img/role/640x741/yijunbingxui_1.jpg"
+					}]
+				},
+				methods: {
+					change: function(index) {
+						// 在这里实现切换选项卡,本质是操作类名
+						this.currentIndex = index;
+					}
+				}
+			})
+		</script>
+	</body>
+</html>
