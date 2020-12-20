@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<users>
+    <user id="1">
+        <name>张三</name>
+        <age>12</age>
+        <sex>f</sex>
+    </user>
+    <user id="2">
+        <name>李四</name>
+        <age>122</age>
+        <sex>m</sex>
+    </user>
+</users>
