@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    <!--配置组件扫描-->
+    <context:component-scan base-package="controller"/>
+
+    <!--配置异常处理器-->
+    <bean id="exceptionResolver" class="exception.MyExceptionResolver"/>
+
+    <!--&lt;!&ndash;配置简单映射异常处理器&ndash;&gt;-->
+    <!--<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">-->
+        <!--&lt;!&ndash;默认错误视图&ndash;&gt;-->
+        <!--<property name="defaultErrorView" value="error"/>-->
+        <!--&lt;!&ndash;错误视图&ndash;&gt;-->
+        <!--<property name="exceptionMappings">-->
+            <!--&lt;!&ndash;异常类型&ndash;&gt;-->
+            <!--<map>-->
+                <!--&lt;!&ndash;其中value值表示的是error.jsp视图&ndash;&gt;-->
+                <!--<entry key="java.lang.IndexOutOfBoundsException" value="error"/>-->
+                <!--<entry key="java.lang.ClassCastException" value="error"/>-->
+            <!--</map>-->
+        <!--</property>-->
+    <!--</bean>-->
+
+</beans>
