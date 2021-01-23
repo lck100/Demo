@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!--定义别名-->
+    <typeAliases>
+        <!--用在AccountMapper.xml文件中的如select等标签的resultType等属性中-->
+        <!--<typeAlias type="com.demo.domain.Account" alias="account"/>-->
+        <!--也可以通过下面的扫包形式，默认分配一个别名，要么是实体类名，要么是实体类名首字母小写，这里是Account或account-->
+        <package name="com.demo.domain"/>
+    </typeAliases>
+
+</configuration>
