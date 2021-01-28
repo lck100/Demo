@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>跨域</title>
+    <script src="js/jquery.min.js"></script>
+  </head>
+  <body>
+    <button id="btn">发送请求</button>
+    <button id="btn_jsonp">发送JSONP请求</button>
+    <button id="btn_post">发送POST请求</button>
+    <button id="btn_cookie">发送带Cookie请求</button>
+    <button id="btn_selfHeader">发送带自定义请求头请求</button>
+    <button id="btn_nginx">使用Nginx代理请求</button>
+    <button id="btn_apache">使用Apache代理请求</button>
+    <button id="btn_spring">使用Spring框架的解决跨域方案发送请求</button>
+    <button id="btn_hide_nginx">调用方解决跨域之使用Nginx隐藏跨域</button>
+    <button id="btn_hide_apache">调用方解决跨域之使用Apache隐藏跨域</button>
+    <p id="msg"></p>
+
+    <a href="http://localhost:8585/test1">超链接</a>
+  </body>
+  <script>
+    // 发送普通跨域请求
+    $("#btn").click(function() {
+      $.ajax({
+        url: 'http://localhost:8585/test1',
+        type: 'GET',
+        success: function(res) {
+          console.log(JSON.parse(res))
+          $("#msg").text(JSON.parse(res).msg)
+        }
+      })
+    })
+    // 发送JSONP请求
+    $("#btn_jsonp").click(function() {
+      $.ajax({
+        url: 'http://localhost:8585/test2',
+        type: 'GET',
+        dataType: 'jsonp',
+        success: function(res) {
+          console.log(res)
+          $("#msg").text(res.msg)
+        }
+      })
+    })
+    // 发送POST请求
+    $("#btn_post").click(function() {
+      $.ajax({
+        url: 'http://localhost:8585/test3',
+        // url: 'http://b.com/test3',
+        type: 'POST',
+        contentType: "application/json;charset=utf-8",
+        data: JSON.stringify({
+          name: 'zhangsan',
+          age: 19
+        }),
+        success: function(res) {
+          console.log(JSON.parse(res))
+          $("#msg").text(JSON.parse(res).msg)
+        }
+      })
+    })
+    // 发送带cookie请求
+    $("#btn_cookie").click(function() {
+      // 设置两个cookie作为测试
+      var date = new Date()
+      date.setTime(date.getTime() + 24 * 60 * 60 * 1000 * 3) // 这里是设置的是3天
+      window.document.cookie = 'age' + '=' + '15' + ';path=/;expires=' + date.toGMTString() // 拼接cookie
+      window.document.cookie = 'sex' + '=' + 'm' + ';path=/;expires=' + date.toGMTString()
+      // 发送请求
+      $.ajax({
+        url: 'http://localhost:8585/test4',
+        type: 'get',
+        xhrFields: {
+          withCredentials: true
+        },
+        success: function(res) {
+          console.log(JSON.parse(res))
+          $("#msg").text(JSON.parse(res).msg)
+        }
+      })
+    })
+    // 发送带自定义请求头的请求
+    // 有两种方式: 一种是使用headers属性,一种是使用beforeSend函数
+    $("#btn_selfHeader").click(function(){
+      $.ajax({
+        url:'http://localhost:8585/test5',
+        type: 'get',
+        headers: {
+          "self-header1":"AAAAA"
+        },
+        beforeSend:function(xhr){
+          xhr.setRequestHeader('self-header2','BBBBB')
+        },
+        success:function(res){
+          console.log(JSON.parse(res))
+          $("#msg").text(JSON.parse(res).msg)
+        }
+      })
+    })
+    // 使用Nginx代理请求
+    $("#btn_nginx").click(function() {
+      $.ajax({
+        url: 'http://b.com/test6',
+        type: 'GET',
+        success: function(res) {
+          console.log(JSON.parse(res))
+          $("#msg").text(JSON.parse(res).msg)
+        }
+      })
+    })
+    // 使用Apache代理请求
+    $("#btn_apache").click(function() {
+      $.ajax({
+        url: 'http://b.com/test7',
+        type: 'GET',
+        success: function(res) {
+          console.log(JSON.parse(res))
+          $("#msg").text(JSON.parse(res).msg)
+        }
+      })
+    })
+    // 发送请求,后台使用spring框架的@CrossOrigin注解解决跨域
+    $("#btn_spring").click(function() {
+      $.ajax({
+        url: 'http://localhost:8585/test8',
+        type: 'GET',
+        success: function(res) {
+          console.log(JSON.parse(res))
+          $("#msg").text(JSON.parse(res).msg)
+        }
+      })
+    })
+    // 调用方解决跨域之使用Nginx隐藏跨域,发送请求
+    $("#btn_hide_nginx").click(function() {
+      $.ajax({
+        // url: 'http://localhost:8585/test9',
+        url: 'http://a.com/ajaxserver/test9',
+        type: 'GET',
+        success: function(res) {
+          console.log(res)
+          $("#msg").text(res.msg)
+        }
+      })
+    })
+    // 调用方解决跨域之使用Apache隐藏跨域
+    $("#btn_hide_apache").click(function() {
+      $.ajax({
+        // url: 'http://localhost:8585/test10',
+        url: 'http://a.com/ajaxserverapache/test10',
+        type: 'GET',
+        success: function(res) {
+          console.log(res)
+          $("#msg").text(res.msg)
+        }
+      })
+    })
+  </script>
+</html>
