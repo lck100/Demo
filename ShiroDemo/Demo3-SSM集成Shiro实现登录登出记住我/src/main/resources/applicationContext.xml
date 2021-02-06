@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--组件扫描，扫描service和mapper-->
+    <context:component-scan base-package="com.demo">
+        <!--排除controller的扫描-->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!--加载properties文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!--配置数据源信息-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!--配置sessionFactory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--注入dataSource-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--加载mybatis核心文件-->
+        <property name="configLocation" value="classpath:sqlMapConfig-spring.xml"/>
+    </bean>
+
+    <!--扫描mapper所在包，为mapper创建实现类-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.demo.mapper"/>
+    </bean>
+
+    <!--声明式事务控制-->
+    <!--平台事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--注入数据源-->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--配置事务增强-->
+    <tx:advice id="txAdvice">
+        <tx:attributes>
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice>
+    <!--事务的AOP织入-->
+    <aop:config>
+        <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.demo.service.impl.*.*(..))"/>
+    </aop:config>
+
+    <!--配置Shiro的认证和授权的过滤器-->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <property name="loginUrl" value="login.html"/>
+        <property name="unauthorizedUrl" value="403.html"/>
+        <property name="filterChainDefinitions">
+            <value>
+                <!--对静态资源不拦截-->
+                <!--anon指匿名访问的过滤器，所有匿名用户都可以访问静态资源，如css等-->
+                /css/*=anon
+                <!--登录页面可以访问-->
+                /login.html = anon
+                <!--登录请求也可以通过-->
+                /user/login = anon
+                <!--表示/testRole请求必须是admin角色才能访问，roles["角色名"]是标准格式-->
+                /testRole = roles["admin"]
+                <!--表示/testRole2请求必须同时具备admin和user角色才能访问-->
+                /testRole2 = roles ["admin","user"]
+                <!--表示/testPerms请求必须具有user:delete权限才能访问，perms["权限名"]是标准格式-->
+                /testPerms = perms["user:delete"]
+                <!--表示/testPerms2请求必须同时具有user:delete权限和user:update权限才能访问-->
+                /testPerms2 = perms["user:delete","user:update"]
+                <!--authc指必须经过认证（登录过之后）才能放弃的请求，/*指的是所有有一个斜杠的请求都要经过认证-->
+                <!--/**表示所有资源和请求都需要认证，/** = authc是标准格式-->
+                <!--/** = authc-->
+                <!--/**=user指的是系统中所有资源和请求需要验证通过或者RememberMe登录的都可以，/**=user是标准格式-->
+                /**=user
+            </value>
+        </property>
+    </bean>
+    <!--创建安全管理器SecurityManager对象-->
+    <bean class="org.apache.shiro.web.mgt.DefaultWebSecurityManager" id="securityManager">
+        <!--声明域，在域中读取认证和授权的数据-->
+        <property name="realm" ref="myRealm"/>
+        <!--声明rememberMe管理器-->
+        <property name="rememberMeManager" ref="rememberMeManager"/>
+    </bean>
+    <!--配置自定义的Realm-->
+    <bean class="com.demo.shiro.realm.MyRealm" id="myRealm">
+        <property name="credentialsMatcher" ref="credentialsMatcher"/>
+    </bean>
+    <!--加密管理器对象-->
+    <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher" id="credentialsMatcher">
+        <!--设置加密的算法：MD5-->
+        <property name="hashAlgorithmName" value="md5"/>
+        <!--设置加密的次数-->
+        <property name="hashIterations" value="1"/>
+    </bean>
+    <!--配置记住我-->
+    <bean class="org.apache.shiro.web.mgt.CookieRememberMeManager" id="rememberMeManager">
+        <property name="cookie" ref="rememberMeCookie"/>
+    </bean>
+    <bean class="org.apache.shiro.web.servlet.SimpleCookie" id="rememberMeCookie">
+        <!--声明Cookie对象-->
+        <constructor-arg value="rememberMe"/>
+        <!--设置cookie的失效时间，单位是秒-->
+        <property name="maxAge" value="3600"/>
+    </bean>
+</beans>
