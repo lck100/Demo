@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--引入properties配置文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!--定义数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!--这里使用MybatisSqlSessionFactory，完成Spring与Mybatis-Plus的整合-->
+    <bean id="sqlSessionFactory" class="com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="typeEnumsPackage" value="com.demo.enumpackage"/>
+        <property name="mapperLocations" value="classpath:com/demo/mapper/*.xml"/>
+        <property name="globalConfig">
+            <bean class="com.baomidou.mybatisplus.core.config.GlobalConfig">
+                <property name="dbConfig">
+                    <bean class="com.baomidou.mybatisplus.core.config.GlobalConfig.DbConfig">
+                        <property name="idType" value="AUTO"/>
+                        <property name="logicDeleteValue" value="1"/>
+                        <property name="logicNotDeleteValue" value="0"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <!-- spring xml 方式 -->
+        <property name="plugins">
+            <array>
+                <bean class="com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor">
+                    <!-- COUNT SQL 解析.可以没有 -->
+                    <property name="countSqlParser" ref="countSqlParser"/>
+                </bean>
+            </array>
+        </property>
+    </bean>
+    <bean id="countSqlParser" class="com.baomidou.mybatisplus.extension.plugins.pagination.optimize.JsqlParserCountOptimize">
+        <!-- 设置为 true 可以优化部分 left join 的sql -->
+        <property name="optimizeJoin" value="true"/>
+    </bean>
+
+    <!--扫描Mapper接口类，使用的是Mybatis原生的扫描器-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.demo.mapper"/>
+    </bean>
+
+    <!--注册自定义的组件-->
+    <bean id="mySqlInjector" class="com.demo.extend.MySqlInjector"/>
+
+    <!--<bean id="myMetaObjectHandler" class="com.demo.extend.MyMetaObjectHandler"/>-->
+    <context:component-scan base-package="com.demo.extend"/>
+</beans>
